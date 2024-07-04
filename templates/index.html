@@ -6,6 +6,7 @@
     <title>Загрузка данных в Google Sheets</title>
 </head>
 <body>
+    <button id="logoutButton">Выйти</button>
     <h1>Загрузка данных в Google Sheets</h1>
     <form id="uploadForm" enctype="multipart/form-data">
         <label for="selected_sheet">Выберите Google Sheets таблицу:</label>
@@ -19,6 +20,7 @@
 
         <button type="submit">Загрузить данные</button>
     </form>
+
 
     <div id="result"></div>
 
@@ -35,13 +37,20 @@
                         sheetSelect.appendChild(option);
                     });
 
-                    // Загрузить листы для первой таблицы
                     loadTabs(data[0]);
                 });
 
             document.getElementById('selected_sheet').addEventListener('change', function() {
                 const selectedSheet = this.value;
                 loadTabs(selectedSheet);
+            });
+
+            document.getElementById('logoutButton').addEventListener('click', function() {
+                fetch('/logout', {
+                    method: 'POST'
+                }).then(() => {
+                    window.location.href = '/login';
+                });
             });
         });
 
