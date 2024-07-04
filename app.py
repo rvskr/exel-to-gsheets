@@ -1,12 +1,20 @@
 import os
 from flask import Flask, request, render_template, jsonify
+from flask_basicauth import BasicAuth
 import pygsheets
 import pandas as pd
 import xlrd
 import threading
 import pickle
+from dotenv import load_dotenv
 
 app = Flask(__name__)
+load_dotenv()  # Загрузить переменные окружения из файла .env
+app.config['BASIC_AUTH_USERNAME'] = os.getenv('BASIC_AUTH_USERNAME')
+app.config['BASIC_AUTH_PASSWORD'] = os.getenv('BASIC_AUTH_PASSWORD')
+
+basic_auth = BasicAuth(app)
+
 # Определяем порт для Flask
 port = int(os.environ.get('PORT', 5000))
 
@@ -67,15 +75,18 @@ except FileNotFoundError:
         pickle.dump(gc, f)
 
 @app.route('/')
+@basic_auth.required
 def index():
     return render_template('index.html')
 
 @app.route('/get_sheets', methods=['GET'])
+@basic_auth.required
 def get_sheets():
     sheets = gc.spreadsheet_titles()
     return jsonify(sheets)
 
 @app.route('/get_tabs', methods=['POST'])
+@basic_auth.required
 def get_tabs():
     sheet_name = request.json['sheet_name']
     sh = gc.open(sheet_name)
@@ -83,6 +94,7 @@ def get_tabs():
     return jsonify(tabs)
 
 @app.route('/upload', methods=['POST'])
+@basic_auth.required
 def upload():
     selected_sheet = request.form['selected_sheet']
     selected_tab = request.form['selected_tab']

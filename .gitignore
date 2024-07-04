@@ -7,3 +7,4 @@ gc.pickle
 /build
 /dist
 main.spec
+.env
