@@ -1,0 +1,92 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Загрузка данных в Google Sheets</title>
+</head>
+<body>
+    <h1>Загрузка данных в Google Sheets</h1>
+    <form id="uploadForm" enctype="multipart/form-data">
+        <label for="selected_sheet">Выберите Google Sheets таблицу:</label>
+        <select id="selected_sheet" name="selected_sheet" required></select><br><br>
+
+        <label for="selected_tab">Выберите лист в таблице:</label>
+        <select id="selected_tab" name="selected_tab" required></select><br><br>
+
+        <label for="excel_file">Выберите файл Excel:</label>
+        <input type="file" id="excel_file" name="excel_file" required><br><br>
+
+        <button type="submit">Загрузить данные</button>
+    </form>
+
+    <div id="result"></div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            fetch('/get_sheets')
+                .then(response => response.json())
+                .then(data => {
+                    const sheetSelect = document.getElementById('selected_sheet');
+                    data.forEach(sheet => {
+                        const option = document.createElement('option');
+                        option.value = sheet;
+                        option.textContent = sheet;
+                        sheetSelect.appendChild(option);
+                    });
+
+                    // Загрузить листы для первой таблицы
+                    loadTabs(data[0]);
+                });
+
+            document.getElementById('selected_sheet').addEventListener('change', function() {
+                const selectedSheet = this.value;
+                loadTabs(selectedSheet);
+            });
+        });
+
+        function loadTabs(sheetName) {
+            fetch('/get_tabs', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({ sheet_name: sheetName })
+            })
+            .then(response => response.json())
+            .then(data => {
+                const tabSelect = document.getElementById('selected_tab');
+                tabSelect.innerHTML = '';
+                data.forEach(tab => {
+                    const option = document.createElement('option');
+                    option.value = tab;
+                    option.textContent = tab;
+                    tabSelect.appendChild(option);
+                });
+            });
+        }
+
+        document.getElementById('uploadForm').addEventListener('submit', function(event) {
+            event.preventDefault();
+            const formData = new FormData(this);
+
+            fetch('/upload', {
+                method: 'POST',
+                body: formData
+            })
+            .then(response => response.json())
+            .then(data => {
+                const resultDiv = document.getElementById('result');
+                if (data.status === 'success') {
+                    resultDiv.innerHTML = `<p style="color: green;">${data.message}</p>`;
+                } else {
+                    resultDiv.innerHTML = `<p style="color: red;">${data.message}</p>`;
+                }
+            })
+            .catch(error => {
+                console.error('Error:', error);
+            });
+        });
+    </script>
+</body>
+</html>
