@@ -3,5 +3,4 @@ pygsheets
 pandas
 openpyxl
 python-docx
-tkinter
 threading
