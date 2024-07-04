@@ -3,4 +3,3 @@ pygsheets
 pandas
 openpyxl
 python-docx
-threading
