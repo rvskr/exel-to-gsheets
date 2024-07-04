@@ -7,6 +7,8 @@ import threading
 import pickle
 
 app = Flask(__name__)
+# Определяем порт для Flask
+port = int(os.environ.get('PORT', 5000))
 
 # Функция для загрузки данных из xls файла в DataFrame
 def load_data_from_xls(file_path):
@@ -93,4 +95,5 @@ def upload():
     return jsonify(result)
 
 if __name__ == '__main__':
-    app.run(debug=True)
+    # Запускаем Flask на указанном порту
+    app.run(host='0.0.0.0', port=port)
