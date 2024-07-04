@@ -4,3 +4,6 @@ credentials.json
 ico.ico
 selected_values.pickle
 gc.pickle
+/build
+/dist
+main.spec
