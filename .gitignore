@@ -2,3 +2,5 @@
 1.xls
 credentials.json
 ico.ico
+selected_values.pickle
+gc.pickle

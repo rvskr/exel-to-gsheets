@@ -3,31 +3,58 @@ import pandas as pd
 import pygsheets
 from openpyxl import load_workbook
 from tkinter import filedialog, Tk, Label, Button, OptionMenu, StringVar, ttk
-from win32com.client import Dispatch as client
 from tkinter import messagebox
 import threading
+import pickle
+from win32com.client import Dispatch as client
 
+# Функция для сохранения выбранных таблицы и листа
+# Функция для сохранения выбранных таблицы и листа
+def save_selected_values(selected_sheet_value, selected_tab):
+    selected_values = {
+        'selected_sheet': selected_sheet_value,
+        'selected_tab': selected_tab.get()
+    }
+    with open('selected_values.pickle', 'wb') as f:
+        pickle.dump(selected_values, f)
+
+# Функция для загрузки сохраненных выбранных таблицы и листа
+def load_selected_values(selected_sheet, selected_tab):
+    try:
+        with open('selected_values.pickle', 'rb') as f:
+            selected_values = pickle.load(f)
+            selected_sheet.set(selected_values['selected_sheet'])
+            selected_tab.set(selected_values['selected_tab'])
+    except FileNotFoundError:
+        pass  # Ничего не делаем, если файл не найден
+
+# Функция для выбора Google Sheets таблицы
 # Функция для выбора Google Sheets таблицы
 def select_google_sheet(gc, var_sheet, var_tab, tab_menu):
     available_sheets = gc.spreadsheet_titles()
     var_sheet.set(available_sheets[0])
 
     def on_option_change(*args):
-        selected_sheet = var_sheet.get()
-        select_google_sheet_tab(gc, selected_sheet, var_tab, tab_menu)
+        selected_sheet_value = var_sheet.get()
+        save_selected_values(selected_sheet_value, var_tab)  # Сохраняем выбранные значения
+        select_google_sheet_tab(gc, selected_sheet_value, var_tab, tab_menu)
 
     option_menu = OptionMenu(root, var_sheet, *available_sheets)
     option_menu.grid(row=2, column=1, pady=5)
     var_sheet.trace('w', on_option_change)
 
 # Функция для выбора листа в Google Sheets таблице
-def select_google_sheet_tab(gc, selected_sheet, var_tab, tab_menu):
-    sh = gc.open(selected_sheet)
+def select_google_sheet_tab(gc, selected_sheet_value, var_tab, tab_menu):
+    sh = gc.open(selected_sheet_value)
     available_tabs = [sheet.title for sheet in sh.worksheets()]
     var_tab.set(available_tabs[0])
     tab_menu['menu'].delete(0, 'end')
     for tab in available_tabs:
         tab_menu['menu'].add_command(label=tab, command=lambda value=tab: var_tab.set(value))
+    
+    save_selected_values(selected_sheet_value, var_tab)  # Сохраняем выбранные значения
+
+
 
 # Функция для выбора файла Excel
 def select_excel_file(var, file_label):
@@ -102,9 +129,15 @@ def start_upload_thread(gc, selected_sheet, selected_tab, excel_file):
     else:
         messagebox.showerror("Ошибка", "Файл Excel не выбран.")
 
-# Аутентификация и создание клиента для доступа к API Google Sheets
-credentials_file = 'credentials.json'
-gc = pygsheets.authorize(service_account_file=credentials_file)
+# Проверяем наличие сохраненного объекта gc
+try:
+    with open('gc.pickle', 'rb') as f:
+        gc = pickle.load(f)
+except FileNotFoundError:
+    credentials_file = 'credentials.json'
+    gc = pygsheets.authorize(service_account_file=credentials_file)
+    with open('gc.pickle', 'wb') as f:
+        pickle.dump(gc, f)
 
 # Создаем окно
 root = Tk()
@@ -115,6 +148,9 @@ root.geometry("500x300")
 selected_sheet = StringVar()
 selected_tab = StringVar()
 excel_file = StringVar()
+
+# Загружаем сохраненные выбранные значения при запуске
+load_selected_values(selected_sheet, selected_tab)
 
 # Определяем стиль для кнопок
 style = ttk.Style()
