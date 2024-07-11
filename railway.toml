@@ -1,0 +1,16 @@
+name = "flask-app"
+
+[services]
+  type = "python"
+  script = "gunicorn -b 0.0.0.0:$PORT app:app"
+  buildCommand = "pip install -r requirements.txt"
+
+[services.envs]
+  BASIC_AUTH_USERNAME = { from = "env" }
+  BASIC_AUTH_PASSWORD = { from = "env" }
+  SECRET_KEY = { from = "env" }
+  GOOGLE_SHEETS_CREDENTIALS = { from = "env" }
+
+  # Correct format for defining environment variables
+  # Ensure $NIXPACKS_PATH is correctly defined or remove if not needed
+  NIXPACKS_PATH = { from = "env" }
