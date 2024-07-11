@@ -6,3 +6,4 @@ python-docx
 xlrd
 flask_basicauth
 python-dotenv
+gunicorn
