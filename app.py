@@ -13,6 +13,7 @@ load_dotenv()
 app = Flask(__name__)
 app.config['BASIC_AUTH_USERNAME'] = os.getenv('BASIC_AUTH_USERNAME')
 app.config['BASIC_AUTH_PASSWORD'] = os.getenv('BASIC_AUTH_PASSWORD')
+app.config['SECRET_KEY'] = os.getenv('SECRET_KEY', 'mysecret')
 
 basic_auth = BasicAuth(app)
 
