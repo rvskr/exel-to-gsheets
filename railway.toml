@@ -1,0 +1,17 @@
+name: flask-app
+services:
+  - name: web
+    type: python
+    env:
+      PYTHON_VERSION: "3.8"
+    buildCommand: pip install -r requirements.txt
+    runCommand: gunicorn -b 0.0.0.0:$PORT app:app
+    envs:
+      BASIC_AUTH_USERNAME:
+        from: env
+      BASIC_AUTH_PASSWORD:
+        from: env
+      SECRET_KEY:
+        from: env
+      GOOGLE_SHEETS_CREDENTIALS:
+        from: env
