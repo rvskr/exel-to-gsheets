@@ -1,5 +1,5 @@
 import os
-from flask import Flask, request, render_template, jsonify, redirect, url_for, make_response, session
+from flask import Flask, request, render_template, jsonify, redirect, url_for, session
 import pygsheets
 import pandas as pd
 import xlrd
@@ -147,10 +147,13 @@ try:
     with open('gc.pickle', 'rb') as f:
         gc = pickle.load(f)
 except FileNotFoundError:
-    credentials_file = 'credentials.json'
-    gc = pygsheets.authorize(service_account_file=credentials_file)
-    with open('gc.pickle', 'wb') as f:
-        pickle.dump(gc, f)
+    credentials_content = os.getenv('GOOGLE_SHEETS_CREDENTIALS')
+    if credentials_content:
+        gc = pygsheets.authorize(service_account_json=credentials_content)
+        with open('gc.pickle', 'wb') as f:
+            pickle.dump(gc, f)
+    else:
+        raise ValueError("GOOGLE_SHEETS_CREDENTIALS переменная не найдена в .env файле.")
 
 @app.route('/')
 def index():
