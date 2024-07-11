@@ -41,34 +41,6 @@ def upload_to_google_sheets(gc, selected_sheet, selected_tab, excel_file):
             max_rows, max_cols = min(df.shape[0], 1086), min(df.shape[1], 56)
             df_selected = df.iloc[:max_rows, :max_cols]
             
-            # Получаем текущие размеры листа Google Sheets
-            num_rows, num_cols = worksheet.rows, worksheet.cols
-            
-            # Определяем диапазон для обновления
-            update_range = f'A1:{chr(64 + max_cols)}{max_rows}'
-            
-            # Преобразование DataFrame в список списков для загрузки в Google Sheets
-            values_to_update = df_selected.values.tolist()
-            
-            # Обновление только нужной области
-            worksheet.update_values(crange=update_range, values=values_to_update)
-            
-            return {"status": "success", "message": "Данные успешно загружены в Google Sheets."}
-        else:
-            return {"status": "error", "message": "Ошибка при загрузке данных из xls файла."}
-    except Exception as e:
-        print(f"Ошибка при загрузке данных: {e}")
-        return {"status": "error", "message": f"Ошибка при загрузке данных: {e}"}
-
-    try:
-        sh = gc.open(selected_sheet)
-        worksheet = sh.worksheet_by_title(selected_tab)
-
-        df = load_data_from_xls(excel_file)
-        if df is not None:
-            max_rows, max_cols = min(df.shape[0], 1086), min(df.shape[1], 56)
-            df_selected = df.iloc[:max_rows, :max_cols]
-            
             # Удаление пустых строк
             df_selected = df_selected.dropna(how='all')
             
@@ -81,48 +53,6 @@ def upload_to_google_sheets(gc, selected_sheet, selected_tab, excel_file):
             # Загрузка данных в лист
             worksheet.update_values(crange='A1', values=values_to_update)
             
-            return {"status": "success", "message": "Данные успешно загружены в Google Sheets."}
-        else:
-            return {"status": "error", "message": "Ошибка при загрузке данных из xls файла."}
-    except Exception as e:
-        print(f"Ошибка при загрузке данных: {e}")
-        return {"status": "error", "message": f"Ошибка при загрузке данных: {e}"}
-
-    try:
-        sh = gc.open(selected_sheet)
-        worksheet = sh.worksheet_by_title(selected_tab)
-
-        df = load_data_from_xls(excel_file)
-        if df is not None:
-            max_rows, max_cols = min(df.shape[0], 1086), min(df.shape[1], 56)
-            df_selected = df.iloc[:max_rows, :max_cols]
-            
-            # Преобразование DataFrame в список списков для загрузки в Google Sheets
-            values_to_update = df_selected.values.tolist()
-            
-            # Очистка листа перед обновлением
-            worksheet.clear()
-            
-            # Загрузка данных в лист
-            worksheet.update_values(crange='A1', values=values_to_update)
-            
-            return {"status": "success", "message": "Данные успешно загружены в Google Sheets."}
-        else:
-            return {"status": "error", "message": "Ошибка при загрузке данных из xls файла."}
-    except Exception as e:
-        print(f"Ошибка при загрузке данных: {e}")
-        return {"status": "error", "message": f"Ошибка при загрузке данных: {e}"}
-
-    try:
-        sh = gc.open(selected_sheet)
-        worksheet = sh.worksheet_by_title(selected_tab)
-
-        df = load_data_from_xls(excel_file)
-        if df is not None:
-            max_rows, max_cols = min(df.shape[0], 1086), min(df.shape[1], 56)
-            df_selected = df.iloc[:max_rows, :max_cols]
-            worksheet.clear()
-            worksheet.update_values(crange='A1', values=df_selected.values.tolist())
             return {"status": "success", "message": "Данные успешно загружены в Google Sheets."}
         else:
             return {"status": "error", "message": "Ошибка при загрузке данных из xls файла."}
