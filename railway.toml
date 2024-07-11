@@ -10,3 +10,7 @@ name = "flask-app"
   BASIC_AUTH_PASSWORD = { from = "env" }
   SECRET_KEY = { from = "env" }
   GOOGLE_SHEETS_CREDENTIALS = { from = "env" }
+
+  # Correct format for defining environment variables
+  # Ensure $NIXPACKS_PATH is correctly defined or remove if not needed
+  NIXPACKS_PATH = { from = "env" }
